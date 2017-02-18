@@ -1,0 +1,1 @@
+This lib for EFM8 silabs microcontroller serial.
