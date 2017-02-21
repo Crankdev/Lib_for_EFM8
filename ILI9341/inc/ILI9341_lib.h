@@ -5,8 +5,8 @@
 // leave the sections inside the "$[...]" comment tags alone
 // or they will be overwritten!
 //=========================================================
-#ifndef __ILI9413_LIB_H__
-#define __ILI9413_LIB_H__
+#ifndef __ILI9341_LIB_H__
+#define __ILI9341_LIB_H__
 // USER CONSTANTS
 // USER PROTOTYPES
 
