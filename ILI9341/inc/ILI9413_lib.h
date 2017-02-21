@@ -96,7 +96,6 @@ extern void printChar (_char ,int16_t x, int16_t y, uint16_t color);
 extern void TextSize( size );
 extern void lcdPrintString(uint8_t *c);
 extern void WriteDisplayBrightness(uint16_t Brightness);
-
 extern uint16_t returnColor24_16(R , G , B);
 
 #endif

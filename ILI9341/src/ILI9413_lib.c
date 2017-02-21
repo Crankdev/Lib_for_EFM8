@@ -10,7 +10,6 @@
 // USER FUNCTIONS
 SI_SBIT(TFTLCD_D1, SFR_P1, 5);
 SI_SBIT(TFTLCD_D0, SFR_P1, 4);
-
 SI_SBIT(TFTLCD_D7, SFR_P1, 3);
 SI_SBIT(TFTLCD_D6, SFR_P1, 2);
 SI_SBIT(TFTLCD_D5, SFR_P1, 1);
@@ -18,21 +17,18 @@ SI_SBIT(TFTLCD_D4, SFR_P1, 0);
 SI_SBIT(TFTLCD_D3, SFR_P0, 7);
 SI_SBIT(TFTLCD_D2, SFR_P0, 6);
 
-
-
 SI_SBIT(TFTLCD_RD, SFR_P2, 2);
 SI_SBIT(TFTLCD_WR, SFR_P2, 3);
 SI_SBIT(TFTLCD_DC, SFR_P2, 4); //TFTLCD_RS
 SI_SBIT(TFTLCD_CS, SFR_P2, 5);
 SI_SBIT(TFTLCD_RST, SFR_P2, 6);
 
-
 int TFT_line=0, TFT_char=0,Text_size=0, Axis=0;
 uint16_t Text_color=0;
 extern unsigned char code ASCII[][5] = {
 	//1 First 32 characters (0x00-0x19) are ignored. These are
 	// non-displayable, control characters.
-	{	0x00, 0x00, 0x00, 0x00, 0x00} // 0x20      0
+	  { 0x00, 0x00, 0x00, 0x00, 0x00} // 0x20      0
 	, {	0x00, 0x00, 0x5f, 0x00, 0x00} // 0x21 !		1
 	, {	0x00, 0x07, 0x00, 0x07, 0x00} // 0x22 "		2
 	, {	0x14, 0x7f, 0x14, 0x7f, 0x14} // 0x23 #		3
@@ -132,7 +128,6 @@ extern unsigned char code ASCII[][5] = {
 
 
 extern void Write_8(DATA) {
-	//printf("\n Write:    ");
 	if (DATA & 0x80) TFTLCD_D7 = 1;             //  "1"
 	else TFTLCD_D7 = 0;
 	if (DATA & 0x40) TFTLCD_D6 = 1;             //  "1"
@@ -149,7 +144,6 @@ extern void Write_8(DATA) {
 	else TFTLCD_D1 = 0;
 	if (DATA & 0x01) TFTLCD_D0 = 1;             //  "1"
 	else TFTLCD_D0 = 0;
-	//printf("\n");
 }
 extern void writecommand(DATA) {
 	TFTLCD_CS = 0;
@@ -174,124 +168,118 @@ extern void writedata(DATA) {
 }
 
 extern void ILI9341_init(void) {
-		TFTLCD_WR = 0;
-		TFTLCD_CS = 1;
-		TFTLCD_RD = 1;
-		// toggle RST low to reset
-	//	TFTLCD_RST = 1;
-	//	Delay(5);
-		TFTLCD_RST = 0;
-		Delay(5);
-		TFTLCD_RST = 1;
-		TFTLCD_CS = 1;
-		Delay(150);
-		writecommand(0xEF);
-		writedata(0x03);
-		writedata(0x80);
-		writedata(0x02);
+	TFTLCD_WR = 0;
+	TFTLCD_CS = 1;
+	TFTLCD_RD = 1;
+	// toggle RST low to reset
+	TFTLCD_RST = 0;
+	Delay(5);
+	TFTLCD_RST = 1;
+	TFTLCD_CS = 1;
+	Delay(150);
+	writecommand(0xEF);
+	writedata(0x03);
+	writedata(0x80);
+	writedata(0x02);
 
-		writecommand(0xCF);
-		writedata(0x00);
-		writedata(0XC1);
-		writedata(0X30);
+	writecommand(0xCF);
+	writedata(0x00);
+	writedata(0XC1);
+	writedata(0X30);
 
-		writecommand(0xED);
-		writedata(0x64);
-		writedata(0x03);
-		writedata(0X12);
-		writedata(0X81);
+	writecommand(0xED);
+	writedata(0x64);
+	writedata(0x03);
+	writedata(0X12);
+	writedata(0X81);
 
-		writecommand(0xE8);
-		writedata(0x85);
-		writedata(0x00);
-		writedata(0x78);
+	writecommand(0xE8);
+	writedata(0x85);
+	writedata(0x00);
+	writedata(0x78);
 
-		writecommand(0xCB);
-		writedata(0x39);
-		writedata(0x2C);
-		writedata(0x00);
-		writedata(0x34);
-		writedata(0x02);
+	writecommand(0xCB);
+	writedata(0x39);
+	writedata(0x2C);
+	writedata(0x00);
+	writedata(0x34);
+	writedata(0x02);
 
-		writecommand(0xF7);
-		writedata(0x20);
+	writecommand(0xF7);
+	writedata(0x20);
 
-		writecommand(0xEA);
-		writedata(0x00);
-		writedata(0x00);
+	writecommand(0xEA);
+	writedata(0x00);
+	writedata(0x00);
 
-		writecommand(ILI9341_PWCTR1);    //Power control
-		writedata(0x23);   //VRH[5:0]
+	writecommand(ILI9341_PWCTR1);    //Power control
+	writedata(0x23);   //VRH[5:0]
 
-		writecommand(ILI9341_PWCTR2);    //Power control
-		writedata(0x10);   //SAP[2:0];BT[3:0]
+	writecommand(ILI9341_PWCTR2);    //Power control
+	writedata(0x10);   //SAP[2:0];BT[3:0]
 
-		writecommand(ILI9341_VMCTR1);    //VCM control
-		writedata(0x3e); //¶Ô±È¶Èµ÷½Ú
-		writedata(0x28);
+	writecommand(ILI9341_VMCTR1);    //VCM control
+	writedata(0x3e); //¶Ô±È¶Èµ÷½Ú
+	writedata(0x28);
 
-		writecommand(ILI9341_VMCTR2);    //VCM control2
-		writedata(0x86);  //--
+	writecommand(ILI9341_VMCTR2);    //VCM control2
+	writedata(0x86);  //--
+	writecommand(ILI9341_MADCTL);    // Memory Access Control
+	writedata(0x48);
+	writecommand(ILI9341_PIXFMT);
+	writedata(0x55);
+	writecommand(ILI9341_FRMCTR1);
+	writedata(0x00);
+	writedata(0x18);
 
-		writecommand(ILI9341_MADCTL);    // Memory Access Control
-		writedata(0x48);
+	writecommand(ILI9341_DFUNCTR);    // Display Function Control
+	writedata(0x08);
+	writedata(0x82);
+	writedata(0x27);
 
-		writecommand(ILI9341_PIXFMT);
-		writedata(0x55);
+	writecommand(0xF2);    // 3Gamma Function Disable
+	writedata(0x00);
 
-		writecommand(ILI9341_FRMCTR1);
-		writedata(0x00);
-		writedata(0x18);
+	writecommand(ILI9341_GAMMASET);    //Gamma curve selected
+	writedata(0x01);
 
-		writecommand(ILI9341_DFUNCTR);    // Display Function Control
-		writedata(0x08);
-		writedata(0x82);
-		writedata(0x27);
+	writecommand(ILI9341_GMCTRP1);    //Set Gamma
+	writedata(0x0F);
+	writedata(0x31);
+	writedata(0x2B);
+	writedata(0x0C);
+	writedata(0x0E);
+	writedata(0x08);
+	writedata(0x4E);
+	writedata(0xF1);
+	writedata(0x37);
+	writedata(0x07);
+	writedata(0x10);
+	writedata(0x03);
+	writedata(0x0E);
+	writedata(0x09);
+	writedata(0x00);
 
-		writecommand(0xF2);    // 3Gamma Function Disable
-		writedata(0x00);
-
-		writecommand(ILI9341_GAMMASET);    //Gamma curve selected
-		writedata(0x01);
-
-		writecommand(ILI9341_GMCTRP1);    //Set Gamma
-		writedata(0x0F);
-		writedata(0x31);
-		writedata(0x2B);
-		writedata(0x0C);
-		writedata(0x0E);
-		writedata(0x08);
-		writedata(0x4E);
-		writedata(0xF1);
-		writedata(0x37);
-		writedata(0x07);
-		writedata(0x10);
-		writedata(0x03);
-		writedata(0x0E);
-		writedata(0x09);
-		writedata(0x00);
-
-		writecommand(ILI9341_GMCTRN1);    //Set Gamma
-		writedata(0x00);
-		writedata(0x0E);
-		writedata(0x14);
-		writedata(0x03);
-		writedata(0x11);
-		writedata(0x07);
-		writedata(0x31);
-		writedata(0xC1);
-		writedata(0x48);
-		writedata(0x08);
-		writedata(0x0F);
-		writedata(0x0C);
-		writedata(0x31);
-		writedata(0x36);
-		writedata(0x0F);
-		writecommand(ILI9341_SLPOUT);    //Exit Sleep
-		writecommand(ILI9341_DISPON);    //Display on
-		fillScreen(returnColor24_16(0x00, 0x00, 0x00));
-		fillScreen(returnColor24_16(0x00, 0x00, 0x00));
-
+	writecommand(ILI9341_GMCTRN1);    //Set Gamma
+	writedata(0x00);
+	writedata(0x0E);
+	writedata(0x14);
+	writedata(0x03);
+	writedata(0x11);
+	writedata(0x07);
+	writedata(0x31);
+	writedata(0xC1);
+	writedata(0x48);
+	writedata(0x08);
+	writedata(0x0F);
+	writedata(0x0C);
+	writedata(0x31);
+	writedata(0x36);
+	writedata(0x0F);
+	writecommand(ILI9341_SLPOUT);    //Exit Sleep
+	writecommand(ILI9341_DISPON);    //Display on
+	fillScreen(returnColor24_16(0x00, 0x00, 0x00));
+	
 }
 extern void fillScreen(uint16_t color) {
   fillRect(0, 0,  ILI9341_TFTWIDTH, ILI9341_TFTHEIGHT, color);
@@ -299,85 +287,73 @@ extern void fillScreen(uint16_t color) {
 
 // fill a rectangle
 extern void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) {
-	 uint8_t  hi,lo;
-  // rudimentary clipping (drawChar w/big text requires this)
-  if((x >= ILI9341_TFTWIDTH) || (y >= ILI9341_TFTHEIGHT)) return;
-  if((x + w - 1) >= ILI9341_TFTWIDTH)  w = ILI9341_TFTWIDTH  - x;
-  if((y + h - 1) >= ILI9341_TFTHEIGHT) h = ILI9341_TFTHEIGHT - y;
+	// rudimentary clipping (drawChar w/big text requires this)
+	if((x >= ILI9341_TFTWIDTH) || (y >= ILI9341_TFTHEIGHT)) return;
+	if((x + w - 1) >= ILI9341_TFTWIDTH)  w = ILI9341_TFTWIDTH  - x;
+	if((y + h - 1) >= ILI9341_TFTHEIGHT) h = ILI9341_TFTHEIGHT - y;
 
-  setAddrWindow(x, y, x+w-1, y+h-1);
+	setAddrWindow(x, y, x+w-1, y+h-1);
 
-
-  hi = color >> 8,
-  lo = color;
-
-  for(y=h; y>0; y--) {
-    for(x=w; x>0; x--) {
-    	writedata(hi);
-    	writedata(lo);
-    }
-  }
+	for(y=h; y>0; y--) {
+		for(x=w; x>0; x--) {
+			writedata(color >> 8);
+			writedata(color);
+		}
+	}
 }
 extern void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
 
-  writecommand(ILI9341_CASET); // Column addr set
-  writedata(x0 >> 8);
-  writedata(x0 & 0xFF);     // XSTART
-  writedata(x1 >> 8);
-  writedata(x1 & 0xFF);     // XEND
+	writecommand(ILI9341_CASET); // Column addr set
+	writedata(x0 >> 8);
+	writedata(x0 & 0xFF);     // XSTART
+	writedata(x1 >> 8);
+	writedata(x1 & 0xFF);     // XEND
 
-  writecommand(ILI9341_PASET); // Row addr set
-  writedata(y0>>8);
-  writedata(y0);     // YSTART
-  writedata(y1>>8);
-  writedata(y1);     // YEND
+	writecommand(ILI9341_PASET); // Row addr set
+	writedata(y0>>8);
+	writedata(y0);     // YSTART
+	writedata(y1>>8);
+	writedata(y1);     // YEND
 
-  writecommand(ILI9341_RAMWR); // write to RAM
+	writecommand(ILI9341_RAMWR); // write to RAM
 }
 extern void drawPixel(int16_t x, int16_t y, uint16_t color) {
-  if((x < 0) ||(x >= ILI9341_TFTWIDTH) || (y < 0) || (y >= ILI9341_TFTHEIGHT)) return;
-  setAddrWindow(x,y,x+1,y+1);
-  writedata(color >> 8);
-  writedata(color);
+	if((x < 0) ||(x >= ILI9341_TFTWIDTH) || (y < 0) || (y >= ILI9341_TFTHEIGHT)) return;
+	setAddrWindow(x,y,x+1,y+1);
+	writedata(color >> 8);
+	writedata(color);
 }
 
 extern void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color) {
-	 uint8_t  hi,lo;
-  // Rudimentary clipping
-  if((x >= ILI9341_TFTWIDTH) || (y >= ILI9341_TFTHEIGHT)) return;
+	// Rudimentary clipping
+	if((x >= ILI9341_TFTWIDTH) || (y >= ILI9341_TFTHEIGHT)) return;
 
-  if((y+h-1) >= ILI9341_TFTHEIGHT)
-    h = ILI9341_TFTHEIGHT-y;
-  setAddrWindow(x, y, x, y+h-1);
+	if((y+h-1) >= ILI9341_TFTHEIGHT)
+		h = ILI9341_TFTHEIGHT-y;
+	setAddrWindow(x, y, x, y+h-1);
 
-  hi = color >> 8;
-  lo = color;
-
-  while (h!=0) {
-	  writedata(hi);
-	  writedata(lo);
-	  h--;
-  }
+	while (h!=0) {
+		writedata(color>>8);
+		writedata(color);
+		h--;
+	}
 }
 
 
 extern void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color) {
-	 uint8_t  hi,lo;
-  // Rudimentary clipping
-  if((x >= ILI9341_TFTWIDTH) || (y >= ILI9341_TFTHEIGHT)) return;
-  if((x+w-1) >= ILI9341_TFTWIDTH)  w = ILI9341_TFTWIDTH-x;
-  setAddrWindow(x, y, x+w-1, y);
+	// Rudimentary clipping
+	if((x >= ILI9341_TFTWIDTH) || (y >= ILI9341_TFTHEIGHT)) return;
+	if((x+w-1) >= ILI9341_TFTWIDTH)  
+		w = ILI9341_TFTWIDTH-x;
+	setAddrWindow(x, y, x+w-1, y);
 
-  hi= color >> 8;
-  lo = color;
-  while (w--) {
-    writedata(hi);
-    writedata(lo);
-  }
+	while (w--) {
+		writedata(color>>8);
+		writedata(color);
+	}
 }
 extern void printChar (_char ,int16_t x, int16_t y, uint16_t color){
-	int i,T;
-
+	int i,T;	
 	i=0;
 	if (Axis == 1){
 		if (_char & 0x01) for (T = Text_size; T >=0 ;T--)drawPixel(y, x+i+T, color);
@@ -398,7 +374,6 @@ extern void printChar (_char ,int16_t x, int16_t y, uint16_t color){
 	}
 	else
 	{
-	//	x=320-x;
 		y=320-y;
 		if (_char & 0x01) for (T = Text_size; T >=0 ;T--)drawPixel(x+i+T, y, color);
 		i +=Text_size+1;
@@ -422,7 +397,8 @@ extern void printString(_char , uint16_t color){
 	int j,T;
 	if (_char >= 20){
 		for (j = 0; j < 5; j++) {
-			for (T = Text_size; T > 0 ;T--)	printChar( ASCII[_char - 0x20][j] , TFT_line,  TFT_char+(j*Text_size)+T, color);
+			for (T = Text_size; T > 0 ;T--)	
+				printChar( ASCII[_char - 0x20][j] , TFT_line,  TFT_char+(j*Text_size)+T, color);
 		}
 		if (Axis == 1){
 			TFT_char += 6*Text_size;
@@ -487,28 +463,28 @@ extern uint16_t returnColor24_16(R , G , B){
 	return color;
 }
 extern void Delay(S) {
-  int t;
-  for (t=S;t>0;t--);
+	int t;
+	for (t=S;t>0;t--);
 }
 extern void setRotation(int rotation){
 	uint16_t t;
 
-	  switch (rotation) {
-	  case 2:
-		t = ILI9341_MADCTL_MX | ILI9341_MADCTL_BGR;
-		break;
-	  case 3:
-		t = ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR;
-		break;
-	 case 0:
-	   t = ILI9341_MADCTL_MY | ILI9341_MADCTL_BGR;
-	   break;
-	  case 1:
-		t = ILI9341_MADCTL_MX | ILI9341_MADCTL_MY | ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR;
-		break;
-	 }
-	  writecommand(ILI9341_MADCTL);
-	  writedata(t); // MADCTL
-	  // For 9341, init default full-screen address window:
-	  setAddrWindow(0, 0, ILI9341_TFTWIDTH - 1, ILI9341_TFTHEIGHT - 1); // CS_IDLE happens here
+	switch (rotation) {
+		case 2:
+			t = ILI9341_MADCTL_MX | ILI9341_MADCTL_BGR;
+			break;
+		case 3:
+			t = ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR;
+			break;
+		case 0:
+			t = ILI9341_MADCTL_MY | ILI9341_MADCTL_BGR;
+			break;
+		case 1:
+			t = ILI9341_MADCTL_MX | ILI9341_MADCTL_MY | ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR;
+			break;
+	}
+	writecommand(ILI9341_MADCTL);
+	writedata(t); // MADCTL
+	// For 9341, init default full-screen address window:
+	setAddrWindow(0, 0, ILI9341_TFTWIDTH - 1, ILI9341_TFTHEIGHT - 1); // CS_IDLE happens here
  }
