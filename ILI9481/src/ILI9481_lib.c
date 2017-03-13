@@ -20,7 +20,7 @@ uint16_t Text_color=0;
 extern unsigned char code ASCII[][5] = {
 	//1 First 32 characters (0x00-0x19) are ignored. These are
 	// non-displayable, control characters.
-	{	0x00, 0x00, 0x00, 0x00, 0x00} // 0x20      0
+	  {	0x00, 0x00, 0x00, 0x00, 0x00} // 0x20      0
 	, {	0x00, 0x00, 0x5f, 0x00, 0x00} // 0x21 !		1
 	, {	0x00, 0x07, 0x00, 0x07, 0x00} // 0x22 "		2
 	, {	0x14, 0x7f, 0x14, 0x7f, 0x14} // 0x23 #		3
@@ -118,7 +118,6 @@ extern unsigned char code ASCII[][5] = {
 	, {	0x78, 0x46, 0x41, 0x46, 0x78} // 0x7f DEL	97
 };
 
-
 extern void Write_8(DATA)
 {
 	P2 = DATA;
@@ -152,81 +151,81 @@ extern void writedata(DATA)
 
 extern void ILI9481_init()
 {
-		TFTLCD_WR = 1;
-		TFTLCD_CS = 0;
+	TFTLCD_WR = 1;
+	TFTLCD_CS = 0;
+	//reset ILI9481
+	TFTLCD_RST = 0;
+	Delay(15);
+	TFTLCD_RST = 1;
+	Delay(15);
 
-		TFTLCD_RST = 0;
-		Delay(15);
-		TFTLCD_RST = 1;
-		Delay(15);
+	Delay(150);
+	LCD_Write_COM(0x11);
+	Delay(20);
+	LCD_Write_COM(0xD0);
+	writedata(0x07);
+	writedata(0x42);
+	writedata(0x18);
 
-		Delay(150);
-		LCD_Write_COM(0x11);
-		Delay(20);
-		LCD_Write_COM(0xD0);
-		writedata(0x07);
-		writedata(0x42);
-		writedata(0x18);
+	LCD_Write_COM(0xD1);
+	writedata(0x00);
+	writedata(0x07);
+	writedata(0x10);
 
-		LCD_Write_COM(0xD1);
-		writedata(0x00);
-		writedata(0x07);
-		writedata(0x10);
+	LCD_Write_COM(0xD2);
+	writedata(0x01);
+	writedata(0x02);
 
-		LCD_Write_COM(0xD2);
-		writedata(0x01);
-		writedata(0x02);
+	LCD_Write_COM(0xC0);
+	writedata(0x10);
+	writedata(0x3B);
+	writedata(0x00);
+	writedata(0x02);
+	writedata(0x11);
 
-		LCD_Write_COM(0xC0);
-		writedata(0x10);
-		writedata(0x3B);
-		writedata(0x00);
-		writedata(0x02);
-		writedata(0x11);
+	LCD_Write_COM(0xC5);
+	writedata(0x03);
 
-		LCD_Write_COM(0xC5);
-		writedata(0x03);
+	LCD_Write_COM(0xC8);
+	writedata(0x00);
+	writedata(0x32);
+	writedata(0x36);
+	writedata(0x45);
+	writedata(0x06);
+	writedata(0x16);
+	writedata(0x37);
+	writedata(0x75);
+	writedata(0x77);
+	writedata(0x54);
+	writedata(0x0C);
+	writedata(0x00);
 
-		LCD_Write_COM(0xC8);
-		writedata(0x00);
-		writedata(0x32);
-		writedata(0x36);
-		writedata(0x45);
-		writedata(0x06);
-		writedata(0x16);
-		writedata(0x37);
-		writedata(0x75);
-		writedata(0x77);
-		writedata(0x54);
-		writedata(0x0C);
-		writedata(0x00);
-
-		LCD_Write_COM(0x36);
-		writedata(0x0A);
+	LCD_Write_COM(0x36);
+	writedata(0x0A);
 
 
-		LCD_Write_COM(0x3A);
-		writedata(0x55);
+	LCD_Write_COM(0x3A);
+	writedata(0x55);
 
-		LCD_Write_COM(0x2A);
-		writedata(0x00);
-		writedata(0x00);
-		writedata(0x01);
-		writedata(0x3F);
+	LCD_Write_COM(0x2A);
+	writedata(0x00);
+	writedata(0x00);
+	writedata(0x01);
+	writedata(0x3F);
 
-		LCD_Write_COM(0x2B);
-		writedata(0x00);
-		writedata(0x00);
-		writedata(0x01);
-		writedata(0xE0);
-		Delay(120);
-		lcdOn();
-		fillScreen(0x00);
-	//	fillScreen(returnColor24_16(0x00, 0x00, 0x00));
-
+	LCD_Write_COM(0x2B);
+	writedata(0x00);
+	writedata(0x00);
+	writedata(0x01);
+	writedata(0xE0);
+	Delay(120);
+	lcdOn();
+	fillScreen(0x00);
 }
-extern void fillScreen(uint16_t color) {
-  fillRect(0, 0,  TFTWIDTH, TFTHEIGHT, color);
+
+extern void fillScreen(uint16_t color) 
+{
+	fillRect(0, 0,  TFTWIDTH, TFTHEIGHT, color);
 }
 // fill a rectangle
 extern void fillRect(int x1, int y1, int x2, int y2, uint16_t color)
@@ -245,15 +244,16 @@ extern void fillRect(int x1, int y1, int x2, int y2, uint16_t color)
 		y1 = y2;
 		y2 = y3;
 	}
-  // rudimentary clipping (drawChar w/big text requires this)
-  setAddrWindow(x1, y1, x2, y2);
-  TFTLCD_RS = 1;
-  LCD_Writ_Bus(color >> 8,color);
-  i=(x2-x1)*(y2-y1);
-  while(i!=0) {
-	  i--;
-	  pulse();pulse();pulse();pulse();pulse();pulse();pulse();pulse();pulse();pulse();pulse();pulse();pulse();pulse();pulse();pulse();
-  }
+	// rudimentary clipping (drawChar w/big text requires this)
+	setAddrWindow(x1, y1, x2, y2);
+	TFTLCD_RS = 1;
+	LCD_Writ_Bus(color >> 8,color);
+	i=(x2-x1)*(y2-y1)*16;
+	while(i!=0) {
+		i--;
+		pulse();
+		//pulse();pulse();pulse();pulse();pulse();pulse();pulse();pulse();pulse();pulse();pulse();pulse();pulse();pulse();pulse();
+	}
 }
 
 extern void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
@@ -272,38 +272,39 @@ extern void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 }
 extern void drawPixel(int16_t x, int16_t y, uint16_t color)
 {
-  if((x < 0) ||(x >= TFTWIDTH) || (y < 0) || (y >= TFTHEIGHT)) return;
-  setAddrWindow(x,y,x+1,y+1);
-  LCD_Write_DATA(color >> 8,color);
+	if((x < 0) ||(x >= TFTWIDTH) || (y < 0) || (y >= TFTHEIGHT)) return;
+	setAddrWindow(x,y,x+1,y+1);
+	LCD_Write_DATA(color >> 8,color);
 }
 
 extern void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
 {
-  // Rudimentary clipping
-  if((x >= TFTWIDTH) || (y >= TFTHEIGHT)) return;
-  if((y+h-1) >= TFTHEIGHT) h = TFTHEIGHT-y;
-  setAddrWindow(x, y, x, y+h-1);
+	// Rudimentary clipping
+	if((x >= TFTWIDTH) || (y >= TFTHEIGHT)) return;
+	if((y+h-1) >= TFTHEIGHT) h = TFTHEIGHT-y;
+	setAddrWindow(x, y, x, y+h-1);
 
-  LCD_Write_DATA(color >> 8,color);
-  while (h--) {
-	  pulse();
-  }
+	LCD_Write_DATA(color >> 8,color);
+	while (h--) {
+		pulse();
+	}
 }
 
 
 extern void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
 {
-  // Rudimentary clipping
-  if((x >= TFTWIDTH) || (y >= TFTHEIGHT)) return;
-  if((x+w-1) >= TFTWIDTH)  w = TFTHEIGHT-x;
-  setAddrWindow(x, y, x+w-1, y);
+	// Rudimentary clipping
+	if((x >= TFTWIDTH) || (y >= TFTHEIGHT)) return;
+	if((x+w-1) >= TFTWIDTH)  w = TFTHEIGHT-x;
+	setAddrWindow(x, y, x+w-1, y);
 
-  LCD_Write_DATA(color >> 8,color);
-  while (w--) {
-	  pulse();
-  }
+	LCD_Write_DATA(color >> 8,color);
+	while (w--) {
+		pulse();
+	}
 }
-extern void printChar (_char ,int16_t x, int16_t y, uint16_t color){
+extern void printChar (_char ,int16_t x, int16_t y, uint16_t color)
+{
 	int i,T;
 	i=0;
 	if (Axis == 1){
@@ -323,8 +324,7 @@ extern void printChar (_char ,int16_t x, int16_t y, uint16_t color){
 		i +=Text_size+1;
 		if (_char & 0x80) for (T = Text_size; T >=0 ;T--)drawPixel(y, x+i+T, color);
 	}
-	else
-	{
+	else {
 	//	x=320-x;
 		y=TFTHEIGHT-y;
 		if (_char & 0x01) for (T = Text_size; T >=0 ;T--)drawPixel(x+i+T, y, color);
@@ -345,7 +345,8 @@ extern void printChar (_char ,int16_t x, int16_t y, uint16_t color){
 	}
 }
 
-extern void printString(_char , uint16_t color){
+extern void printString(_char , uint16_t color)
+{
 	int j,T;
 	if (_char >= 20){
 		for (j = 0; j < 5; j++) {
@@ -381,7 +382,8 @@ extern void printString(_char , uint16_t color){
 		}
 	}
 }
-extern void TextSize( size ){
+extern void TextSize( size )
+{
 	if (TFT_char !=0)	printString('\n', Text_color);
 	if (Axis == 1){
 	//	TFT_char = 0;
@@ -397,13 +399,15 @@ extern void TextSize( size ){
 	}
 }
 
-extern void lcdPrintString( uint8_t *c) {
+extern void lcdPrintString( uint8_t *c) 
+{
 	while (*c) {
 		printString(*c++, Text_color);
 	}
 }
 
-extern uint16_t returnColor24_16(R , G , B){
+extern uint16_t returnColor24_16(R , G , B)
+{
 	uint16_t color;
 	R = R>>3 ;
 	G = G>>2 ;
@@ -411,7 +415,8 @@ extern uint16_t returnColor24_16(R , G , B){
 	color = R<<11 | G<<5 |B;
 	return color;
 }
-extern void Delay(S) {
+extern void Delay(S) 
+{
   int t;
   for (t=S;t>0;t--);
 }
@@ -449,7 +454,6 @@ extern void lcdOn()
 }
 extern void pulse()
 {
-	//Delay(5);
 	TFTLCD_WR = 0;
 	TFTLCD_WR = 1;
 }
@@ -594,13 +598,14 @@ extern void drawCircle(int x, int y, int radius, uint16_t color)
 extern void fillCircle(int x, int y, int radius, uint16_t color)
 {
 	int x1,y1;
-	for( y1=-radius; y1<=0; y1++)
-		for( x1=-radius; x1<=0; x1++)
-			if(x1*x1+y1*y1 <= radius*radius)
-			{
+	for( y1=-radius; y1<=0; y1++){
+		for( x1=-radius; x1<=0; x1++){
+			if(x1*x1+y1*y1 <= radius*radius){
 				drawFastHLine(x+x1, y+y1, 2*(-x1),color);
 				drawFastHLine(x+x1, y-y1, 2*(-x1),color);
 			}
+		}
+	}
 }
 /*
 extern void _fast_fill_16(int ch, int cl, long pix)
