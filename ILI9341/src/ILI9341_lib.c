@@ -4,12 +4,13 @@
 
 // USER INCLUDES
 #include <SI_EFM8UB2_Register_Enums.h>
-#include "ILI9413_lib.h"
+#include "ILI9341_lib.h"
 
 // USER PROTOTYPES
 // USER FUNCTIONS
 SI_SBIT(TFTLCD_D1, SFR_P1, 5);
 SI_SBIT(TFTLCD_D0, SFR_P1, 4);
+
 SI_SBIT(TFTLCD_D7, SFR_P1, 3);
 SI_SBIT(TFTLCD_D6, SFR_P1, 2);
 SI_SBIT(TFTLCD_D5, SFR_P1, 1);
@@ -23,12 +24,13 @@ SI_SBIT(TFTLCD_DC, SFR_P2, 4); //TFTLCD_RS
 SI_SBIT(TFTLCD_CS, SFR_P2, 5);
 SI_SBIT(TFTLCD_RST, SFR_P2, 6);
 
-int TFT_line=0, TFT_char=0,Text_size=0, Axis=0;
-uint16_t Text_color=0;
+
+int TFT_line=0, TFT_char=0,Text_size=0, Axis=0,TFT_zdvig=0;
+uint16_t Text_color=0,  Font_color=0x00;
 extern unsigned char code ASCII[][5] = {
 	//1 First 32 characters (0x00-0x19) are ignored. These are
 	// non-displayable, control characters.
-	  { 0x00, 0x00, 0x00, 0x00, 0x00} // 0x20      0
+	{	0x00, 0x00, 0x00, 0x00, 0x00} // 0x20      0
 	, {	0x00, 0x00, 0x5f, 0x00, 0x00} // 0x21 !		1
 	, {	0x00, 0x07, 0x00, 0x07, 0x00} // 0x22 "		2
 	, {	0x14, 0x7f, 0x14, 0x7f, 0x14} // 0x23 #		3
@@ -128,6 +130,7 @@ extern unsigned char code ASCII[][5] = {
 
 
 extern void Write_8(DATA) {
+	//printf("\n Write:    ");
 	if (DATA & 0x80) TFTLCD_D7 = 1;             //  "1"
 	else TFTLCD_D7 = 0;
 	if (DATA & 0x40) TFTLCD_D6 = 1;             //  "1"
@@ -144,6 +147,7 @@ extern void Write_8(DATA) {
 	else TFTLCD_D1 = 0;
 	if (DATA & 0x01) TFTLCD_D0 = 1;             //  "1"
 	else TFTLCD_D0 = 0;
+	//printf("\n");
 }
 extern void writecommand(DATA) {
 	TFTLCD_CS = 0;
@@ -224,10 +228,13 @@ extern void ILI9341_init(void) {
 
 	writecommand(ILI9341_VMCTR2);    //VCM control2
 	writedata(0x86);  //--
+
 	writecommand(ILI9341_MADCTL);    // Memory Access Control
 	writedata(0x48);
+
 	writecommand(ILI9341_PIXFMT);
 	writedata(0x55);
+
 	writecommand(ILI9341_FRMCTR1);
 	writedata(0x00);
 	writedata(0x18);
@@ -278,22 +285,23 @@ extern void ILI9341_init(void) {
 	writedata(0x0F);
 	writecommand(ILI9341_SLPOUT);    //Exit Sleep
 	writecommand(ILI9341_DISPON);    //Display on
-	fillScreen(returnColor24_16(0x00, 0x00, 0x00));
-	
+	fillScreen(Font_color);
+	fillScreen(Font_color);
+
 }
-extern void fillScreen(uint16_t color) {
-  fillRect(0, 0,  ILI9341_TFTWIDTH, ILI9341_TFTHEIGHT, color);
+extern void fillScreen(uint16_t color)
+{
+	fillRect(0, 0,  ILI9341_TFTWIDTH, ILI9341_TFTHEIGHT, color);
 }
 
 // fill a rectangle
-extern void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color) {
+extern void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
+{
 	// rudimentary clipping (drawChar w/big text requires this)
 	if((x >= ILI9341_TFTWIDTH) || (y >= ILI9341_TFTHEIGHT)) return;
 	if((x + w - 1) >= ILI9341_TFTWIDTH)  w = ILI9341_TFTWIDTH  - x;
 	if((y + h - 1) >= ILI9341_TFTHEIGHT) h = ILI9341_TFTHEIGHT - y;
-
 	setAddrWindow(x, y, x+w-1, y+h-1);
-
 	for(y=h; y>0; y--) {
 		for(x=w; x>0; x--) {
 			writedata(color >> 8);
@@ -301,8 +309,8 @@ extern void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
 		}
 	}
 }
-extern void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
-
+extern void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
+{
 	writecommand(ILI9341_CASET); // Column addr set
 	writedata(x0 >> 8);
 	writedata(x0 & 0xFF);     // XSTART
@@ -317,43 +325,39 @@ extern void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
 
 	writecommand(ILI9341_RAMWR); // write to RAM
 }
-extern void drawPixel(int16_t x, int16_t y, uint16_t color) {
+extern void drawPixel(int16_t x, int16_t y, uint16_t color)
+{
 	if((x < 0) ||(x >= ILI9341_TFTWIDTH) || (y < 0) || (y >= ILI9341_TFTHEIGHT)) return;
 	setAddrWindow(x,y,x+1,y+1);
 	writedata(color >> 8);
 	writedata(color);
 }
 
-extern void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color) {
+extern void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
+{
 	// Rudimentary clipping
 	if((x >= ILI9341_TFTWIDTH) || (y >= ILI9341_TFTHEIGHT)) return;
-
-	if((y+h-1) >= ILI9341_TFTHEIGHT)
-		h = ILI9341_TFTHEIGHT-y;
+	if((y+h-1) >= ILI9341_TFTHEIGHT)h = ILI9341_TFTHEIGHT-y;
 	setAddrWindow(x, y, x, y+h-1);
-
 	while (h!=0) {
-		writedata(color>>8);
+		writedata(color >> 8);
 		writedata(color);
 		h--;
 	}
 }
-
-
-extern void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color) {
+extern void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
+{
 	// Rudimentary clipping
 	if((x >= ILI9341_TFTWIDTH) || (y >= ILI9341_TFTHEIGHT)) return;
-	if((x+w-1) >= ILI9341_TFTWIDTH)  
-		w = ILI9341_TFTWIDTH-x;
+	if((x+w-1) >= ILI9341_TFTWIDTH)  w = ILI9341_TFTWIDTH-x;
 	setAddrWindow(x, y, x+w-1, y);
-
 	while (w--) {
-		writedata(color>>8);
+		writedata(color >> 8);
 		writedata(color);
 	}
 }
 extern void printChar (_char ,int16_t x, int16_t y, uint16_t color){
-	int i,T;	
+	int i,T;
 	i=0;
 	if (Axis == 1){
 		if (_char & 0x01) for (T = Text_size; T >=0 ;T--)drawPixel(y, x+i+T, color);
@@ -374,7 +378,8 @@ extern void printChar (_char ,int16_t x, int16_t y, uint16_t color){
 	}
 	else
 	{
-		y=320-y;
+	//	x=ILI9341_TFTHEIGHT-x;
+		y=ILI9341_TFTHEIGHT-y;
 		if (_char & 0x01) for (T = Text_size; T >=0 ;T--)drawPixel(x+i+T, y, color);
 		i +=Text_size+1;
 		if (_char & 0x02) for (T = Text_size; T >=0 ;T--)drawPixel(x+i+T, y, color);
@@ -397,23 +402,22 @@ extern void printString(_char , uint16_t color){
 	int j,T;
 	if (_char >= 20){
 		for (j = 0; j < 5; j++) {
-			for (T = Text_size; T > 0 ;T--)	
-				printChar( ASCII[_char - 0x20][j] , TFT_line,  TFT_char+(j*Text_size)+T, color);
+			for (T = Text_size; T > 0 ;T--)	printChar( ASCII[_char - 0x20][j] , TFT_line,  TFT_char+(j*Text_size)+T, color);
 		}
 		if (Axis == 1){
 			TFT_char += 6*Text_size;
-			if (TFT_char > (240 - 5*Text_size)){ TFT_char = 0; TFT_line += (Text_size *10)+5; }
-			if (TFT_line > 320 -Text_size*9 ) TFT_line = 0;
+			if (TFT_char > (ILI9341_TFTWIDTH - 5*Text_size-TFT_zdvig)){ TFT_char = 0+TFT_zdvig; TFT_line += (Text_size *10)+5; }
+			if (TFT_line > ILI9341_TFTHEIGHT -Text_size*9 ) TFT_line = 0;
 		}
 		else
 		{
 			TFT_char += 6*Text_size;
-			if (TFT_char > (320 - 5*Text_size)){ TFT_char = 0; TFT_line += (Text_size *10)+5; }
-			if (TFT_line > 240 -Text_size*9 ) TFT_line = 0;
+			if (TFT_char > (ILI9341_TFTHEIGHT - 5*Text_size-TFT_zdvig)){ TFT_char = 0+TFT_zdvig; TFT_line += (Text_size *10)+5; }
+			if (TFT_line > ILI9341_TFTWIDTH -Text_size*9 ) TFT_line = 0;
 		}
 	}
 	if (_char == '\f'){
-		fillScreen(returnColor24_16(0x00 , 0x00 , 0x00)); //lcdClear();
+		fillScreen(Font_color); //lcdClear();
 		TFT_char = 0;
 		TFT_line = 0;
 	}
@@ -421,35 +425,33 @@ extern void printString(_char , uint16_t color){
 		if (Axis == 1){
 			TFT_char =0;
 			TFT_line += (Text_size *10)+5;
-			if (TFT_line > 320 -Text_size*9 ) TFT_line = 0;
+			if (TFT_line > ILI9341_TFTHEIGHT -Text_size*9 ) TFT_line = 0;
 		}
 		else {
 			TFT_char =0;
 			TFT_line += (Text_size *10)+5;
-			if (TFT_line > 240 -Text_size*9 ) TFT_line = 0;
+			if (TFT_line > ILI9341_TFTWIDTH -Text_size*9 ) TFT_line = 0;
 		}
 	}
 }
-extern void TextSize( size ){
+extern void TextSize( size )
+{
 	if (TFT_char !=0)	printString('\n', Text_color);
 	if (Axis == 1){
-	//	TFT_char = 0;
 		if ( TFT_char!=0)TFT_line += (Text_size *10)+5;
-		if (TFT_line > 320 -Text_size*9 ) TFT_line = 0;
+		if (TFT_line > ILI9341_TFTHEIGHT -Text_size*9 ) TFT_line = 0;
 		Text_size = size;
 	}
 	else {
-	//	TFT_char = 0;
 		if ( TFT_char!=0)TFT_line += (Text_size *10)+5;
-		if (TFT_line > 240 -Text_size*9 ) TFT_line = 0;
+		if (TFT_line > ILI9341_TFTWIDTH -Text_size*9 ) TFT_line = 0;
 		Text_size = size;
 	}
 }
 
-extern void lcdPrintString( uint8_t *c) {
+extern void lcdPrintString( uint8_t *c)
+{
 	while (*c) {
-		//	 switch()
-		//lcd_CharCheck(*c++);
 		printString(*c++, Text_color);
 	}
 }
@@ -468,23 +470,41 @@ extern void Delay(S) {
 }
 extern void setRotation(int rotation){
 	uint16_t t;
-
 	switch (rotation) {
-		case 2:
-			t = ILI9341_MADCTL_MX | ILI9341_MADCTL_BGR;
-			break;
-		case 3:
-			t = ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR;
-			break;
-		case 0:
-			t = ILI9341_MADCTL_MY | ILI9341_MADCTL_BGR;
-			break;
-		case 1:
-			t = ILI9341_MADCTL_MX | ILI9341_MADCTL_MY | ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR;
-			break;
+	 	 case 2:
+	 		 t = ILI9341_MADCTL_MX | ILI9341_MADCTL_BGR;
+	 		 break;
+	 	 case 3:
+	 		 t = ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR;
+	 		 break;
+	 	 case 0:
+	 		 t = ILI9341_MADCTL_MY | ILI9341_MADCTL_BGR;
+	 		 break;
+	 	 case 1:
+	 		 t = ILI9341_MADCTL_MX | ILI9341_MADCTL_MY | ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR;
+	 		 break;
 	}
 	writecommand(ILI9341_MADCTL);
 	writedata(t); // MADCTL
 	// For 9341, init default full-screen address window:
 	setAddrWindow(0, 0, ILI9341_TFTWIDTH - 1, ILI9341_TFTHEIGHT - 1); // CS_IDLE happens here
  }
+extern void charDelete(int col)
+{
+	int j,T,i;
+	for(i=0;i<=col;i++){
+		for (j = 0; j < 5; j++) {
+			for (T = Text_size; T > 0 ;T--)	printChar( 0xff , TFT_line,  TFT_char-(j*Text_size)+T, Font_color);
+		}
+		TFT_char -= 6*Text_size;
+		if (Axis == 1){
+			if (TFT_char < (ILI9341_TFTWIDTH - 5*Text_size)){ TFT_char = ILI9341_TFTWIDTH; TFT_line -= (Text_size *10)+5; }
+			//if (TFT_line < ILI9341_TFTHEIGHT - Text_size*9 ) TFT_line = 0;
+		}
+		else
+		{
+			if (TFT_char < (ILI9341_TFTHEIGHT - 5*Text_size)){ TFT_char = ILI9341_TFTHEIGHT; TFT_line -= (Text_size *10)+5; }
+			//if (TFT_line < ILI9341_TFTWIDTH - Text_size*9 ) TFT_line = 0;
+		}
+	}
+}
